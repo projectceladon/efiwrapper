@@ -37,9 +37,9 @@
 #include <hwconfig.h>
 #include "s8250mem32.h"
 
-#define SBL_SERIAL_BASEADDR "serail_baseaddr"
-#define SBL_SERIAL_TYPE "serail_type"
-#define SBL_SERIAL_REGWIDTH "serail_regwidth"
+#define SBL_SERIAL_BASEADDR "serial_baseaddr"
+#define SBL_SERIAL_TYPE "serial_type"
+#define SBL_SERIAL_REGWIDTH "serial_regwidth"
 
 #ifndef SERIAL_BASEADDR
 #include <pci/pci.h>
