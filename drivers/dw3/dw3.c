@@ -73,6 +73,9 @@ static void *device_core_ptr = NULL;
 /* initialized by dwc_xdci_core_init */
 static void *core_handle = NULL;
 
+/* Record usb device state */
+static BOOLEAN usb_dev_state = TRUE;
+
 /* controller config for device role */
 /* register offset */
 #define R_XHCI_MEM_DUAL_ROLE_CFG0 0x80D8
@@ -644,6 +647,7 @@ UsbdSetupHdlr (
 	                if (CtrlRequest->RequestType & USB_RT_TX_DIR_D_TO_H) {
 	                        Status = UsbdGetStatus (mCtrlIoReq.IoInfo.Buffer, CtrlRequest->RequestType, CtrlRequest->Length, &(mCtrlIoReq.IoInfo.Length));
 	                } else {
+				usb_dev_state = FALSE;
 	                        DEBUG ((DEBUG_INFO, "UsbdSetupHdlr: Invalid direction for USB_REQ_GET_STATUS request\n"));
 	                }
 	                break;
@@ -980,6 +984,9 @@ _usb_run(__attribute__((__unused__)) EFI_USB_DEVICE_MODE_PROTOCOL *This,
 	        if (dwc_xdci_core_isr_routine(core_handle) != EFI_SUCCESS) {
 	                DEBUG ((DEBUG_INFO, "UsbDeviceRun() - Failed to execute event ISR\n"));
 	        }
+
+		if (!usb_dev_state)
+			return EFI_DEVICE_ERROR;
 
 	        /* check for timeout */
 	        if (TimeoutMs == 0) {
