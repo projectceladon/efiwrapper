@@ -208,6 +208,11 @@ Exit:
   if (NamespaceData != NULL) {
     FreeZero (NamespaceData);
   }
+
+  if (EFI_ERROR(Status) && (Device != NULL)) {
+    FreeZero (Device);
+  }
+
   return Status;
 }
 
