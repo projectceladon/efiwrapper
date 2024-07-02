@@ -797,7 +797,11 @@ static uint64_t pci_read_bar64(pcidev_t device)
 	if ((addr & PCI_BASE_ADDRESS_MEM_TYPE_MASK) != PCI_BASE_ADDRESS_MEM_TYPE_64)
 		return addr & ~0xf;
 
-	addr64 = pci_read_config32(device, PCI_BASE_ADDRESS_0 + 4);
+	pci_write_config32(device, PCI_BASE_ADDRESS_0, addr & ~0xf);
+
+	addr64 = pci_read_config32(device, PCI_BASE_ADDRESS_1);
+
+	pci_write_config32(device, PCI_BASE_ADDRESS_1, (uint32_t)addr64 & ~0xf);
 	addr64 <<= 32;
 	addr64 |= addr & ~0xf;
 
@@ -825,7 +829,10 @@ _usb_init_xdci(EFI_USB_DEVICE_MODE_PROTOCOL *This)
 	device_core_ptr = (void *) This;
 
 	/* get xDCI base address */
-	pci_find_device(INTEL_VID, XDCI_PID, &pci_dev);
+	if (!pci_find_device(INTEL_VID, XDCI_PID, &pci_dev)) {
+		ewdbg("XDCI is not found!");
+		return EFI_DEVICE_ERROR;
+	}
 
 	ewdbg("PCI xDCI [%x:%x] %d.%d.%d", INTEL_VID, XDCI_PID,
 	      PCI_BUS(pci_dev), PCI_SLOT(pci_dev), PCI_FUNC(pci_dev));
