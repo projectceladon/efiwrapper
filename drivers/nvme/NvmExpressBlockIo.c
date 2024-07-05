@@ -482,8 +482,10 @@ NvmeBlockIoWriteBlocks (
 	if (MediaId != Media->MediaId)
 		return EFI_MEDIA_CHANGED;
 
-	if (Buffer == NULL)
+#ifndef __CRASH_DUMP   // crash dump will dump from the address 0
+	if (Buffer == NULL) //remove this check, allow to write content of zero address to nvme
 		return EFI_INVALID_PARAMETER;
+#endif
 
 	if (BufferSize == 0)
 		return EFI_SUCCESS;
