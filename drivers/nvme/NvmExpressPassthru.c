@@ -635,6 +635,7 @@ NvmExpressPassThru (
 			Status = EFI_SUCCESS;
 		else {
 			Status = EFI_DEVICE_ERROR;
+			DEBUG_NVME ((EFI_D_ERROR, "NvmExpressPassThru:Cq->Sct = %d, Cq->Sc = %d\n",Cq->Sct,Cq->Sc ));
 			//
 			// Copy the Respose Queue entry for this command to the callers response buffer
 			//

@@ -134,7 +134,11 @@ diskio_write(_EFI_DISK_IO *This,
 	unsigned char *buf = Buffer, *block;
 	media_t *media;
 
-	if (!This || !Buffer)
+#ifndef __CRASH_DUMP
+	if (!This && !Buffer)
+#else  // crash dump need dump the address 0
+	if (!This)
+#endif
 		return EFI_INVALID_PARAMETER;
 
 	if (!diskio->media)
