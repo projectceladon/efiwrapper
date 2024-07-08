@@ -189,10 +189,10 @@ EFI_STATUS storage_init(EFI_SYSTEM_TABLE *st, storage_t *storage,
 
 err:
 	for (j = 0; j < i; j++) {
-		tmp_ret = STORAGE_INTERFACES[i].free(st, handle);
+		tmp_ret = STORAGE_INTERFACES[j].free(st, handle);
 		if (EFI_ERROR(tmp_ret))
 			ewerr("Failed to unregister %s interface",
-			      STORAGE_INTERFACES[i].name);
+			      STORAGE_INTERFACES[j].name);
 	}
 	free(media);
 	return ret;
