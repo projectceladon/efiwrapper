@@ -39,6 +39,9 @@ static struct supported_device {
 	u16 did;
 } SUPPORTED_DEVICES[] = {
 	{ .vid = 0x144d, .did = NVME_PCI_DID },
+	{ .vid = 0x144d, .did = 0xA808 },
+	{ .vid = 0x15b7, .did = 0x5019 },
+	{ .vid = 0x1344, .did = 0x6001 }, // for Micron device
 	{ .vid = 0x8086, .did = 0xF1A6 },
 };
 
