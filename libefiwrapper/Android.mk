@@ -48,3 +48,18 @@ LOCAL_C_INCLUDES := \
 LOCAL_MODULE_HOST_ARCH := $(EFIWRAPPER_HOST_ARCH)
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/../include/libefiwrapper
 include $(BUILD_HOST_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := libefiwrapper-cd-$(TARGET_BUILD_VARIANT)
+LOCAL_STATIC_LIBRARIES := \
+	libgnuefi \
+	libefi
+LOCAL_SRC_FILES := $(LIBEFIWRAPPER_SRC_FILES)
+LOCAL_CFLAGS := $(EFIWRAPPER_CFLAGS)
+LOCAL_CFLAGS += -D__CRASH_DUMP
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include/libefiwrapper \
+	$(LOCAL_PATH)/../../external/gnu-efi/gnu-efi-3.0/inc \
+	$(LOCAL_PATH)/../../external/gnu-efi/gnu-efi-3.0/inc/$(TARGET_EFI_ARCH_NAME) \
+	$(LOCAL_PATH)/../../external/gnu-efi/gnu-efi-3.0/inc/protocol
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/../include/libefiwrapper
+include $(BUILD_IAFW_STATIC_LIBRARY)
