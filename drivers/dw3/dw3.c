@@ -532,10 +532,6 @@ UsbdSetConfig (
 	        }
 	}
 
-	if (EFI_ERROR (Status)) {
-	        DEBUG ((DEBUG_INFO, "UsbdSetConfig() - Invalid requested configuration value: %i\n", CfgValue));
-	}
-
 	return Status;
 }
 
@@ -580,6 +576,9 @@ UsbdSetupHdlr (
 	                                        CtrlRequest->Length,
 	                                        &(mCtrlIoReq.IoInfo.Length)
 	                                        );
+	                                if (EFI_ERROR (Status)) {
+	                                    DEBUG ((DEBUG_INFO, "UsbdGetConfigDesc() - EFI_DEVICE_ERROR"));
+	                                }
 	                                break;
 
 	                        case USB_DESC_TYPE_STRING:
@@ -591,6 +590,9 @@ UsbdSetupHdlr (
 	                                        CtrlRequest->Length,
 	                                        &(mCtrlIoReq.IoInfo.Length)
 	                                        );
+                                    if (EFI_ERROR (Status)) {
+                                        DEBUG ((DEBUG_INFO, "UsbdGetStringDesc() - EFI_DEVICE_ERROR"));
+                                    }
 	                                break;
 
 #ifdef SUPPORT_SUPER_SPEED
@@ -621,6 +623,9 @@ UsbdSetupHdlr (
 	                DEBUG ((DEBUG_INFO, "USB_REQ_GET_CONFIG\n"));
 	                if (CtrlRequest->RequestType == USB_RT_TX_DIR_D_TO_H) {
 	                        Status = UsbdGetConfig (mCtrlIoReq.IoInfo.Buffer, CtrlRequest->Length, &(mCtrlIoReq.IoInfo.Length));
+	                        if (EFI_ERROR (Status)) {
+	                            DEBUG ((DEBUG_INFO, "UsbdGetConfig() - EFI_DEVICE_ERROR"));
+	                        }
 	                } else {
 	                        DEBUG ((DEBUG_INFO, "UsbdSetupHdlr: Invalid direction for USB_REQ_GET_CONFIG request\n"));
 	                }
@@ -630,6 +635,9 @@ UsbdSetupHdlr (
 	                DEBUG ((DEBUG_INFO, "USB_REQ_SET_CONFIG\n"));
 	                if (CtrlRequest->RequestType == USB_RT_TX_DIR_H_TO_D) {
 	                        Status = UsbdSetConfig ((UINT8)CtrlRequest->Value);
+	                        if (EFI_ERROR (Status)) {
+	                                DEBUG ((DEBUG_INFO, "UsbdSetConfig() - Invalid requested configuration value: %i\n", CfgValue));
+	                        }
 	                } else {
 	                        DEBUG ((DEBUG_INFO, "UsbdSetupHdlr: Invalid direction for USB_REQ_SET_CONFIG request\n"));
 	                }
@@ -639,6 +647,9 @@ UsbdSetupHdlr (
 	                DEBUG ((DEBUG_INFO, "USB_REQ_SET_ADDRESS\n"));
 	                if (CtrlRequest->RequestType == USB_RT_TX_DIR_H_TO_D) {
 	                        Status = UsbdSetAddress ((UINT8)CtrlRequest->Value);
+	                        if (EFI_ERROR (Status)) {
+	                            DEBUG ((DEBUG_INFO, "UsbdSetAddress: EFI_DEVICE_ERROR\n"));
+	                        }
 	                } else {
 	                        DEBUG ((DEBUG_INFO, "UsbdSetupHdlr: Invalid direction for USB_REQ_SET_ADDRESS request\n"));
 	                }
@@ -648,6 +659,9 @@ UsbdSetupHdlr (
 	                DEBUG ((DEBUG_INFO, "USB_REQ_GET_STATUS\n"));
 	                if (CtrlRequest->RequestType & USB_RT_TX_DIR_D_TO_H) {
 	                        Status = UsbdGetStatus (mCtrlIoReq.IoInfo.Buffer, CtrlRequest->RequestType, CtrlRequest->Length, &(mCtrlIoReq.IoInfo.Length));
+	                        if (EFI_ERROR (Status)) {
+	                            DEBUG ((DEBUG_INFO, "UsbdGetStatus: EFI_DEVICE_ERROR\n"));
+	                        }
 	                } else {
 	                        DEBUG ((DEBUG_INFO, "UsbdSetupHdlr: Invalid direction for USB_REQ_GET_STATUS request\n"));
 	                }
