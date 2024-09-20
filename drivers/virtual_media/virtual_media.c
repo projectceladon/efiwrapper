@@ -64,6 +64,10 @@ static EFI_STATUS _init(storage_t *s)
 
 	if (pci_dev[VirtualRpmb])
 		ret = VirtioRpmbInitialize((UINTN)pci_dev[VirtualRpmb]);
+	if (EFI_ERROR(ret)) {
+		ewerr ("VirtioRpmbInitialize Error %x\n",(UINT32)ret);
+		//return ret;
+	}
 
 	ret = VirtioGetMediaInfo(DEVICE_INDEX_DEFAULT, &BlockInfo);
 	if (EFI_ERROR(ret)) {
