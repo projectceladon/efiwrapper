@@ -57,8 +57,6 @@ static RPMB_DATA_FRAME *VrpmbGetFrameAddress(VOID *virtio_buffer, UINT32 index)
 
 	for (i = 0; i < index; i++) {
 		cmd = &cmds[i];
-		if (!cmd)
-			return NULL;
 		offset += cmd->n_rpmb_frame;
 	}
 
