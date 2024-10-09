@@ -184,7 +184,7 @@ EFI_STATUS storage_init(EFI_SYSTEM_TABLE *st, storage_t *storage,
 			goto err;
 		}
 	}
-
+	free(media);
 	return EFI_SUCCESS;
 
 err:
