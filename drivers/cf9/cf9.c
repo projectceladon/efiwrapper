@@ -47,9 +47,6 @@ cf9_reset_system(EFI_RESET_TYPE ResetType,
 	UINT8 cf9;
 	UINT32 port = 0xcf9;
 
-	if (ResetType == EfiResetShutdown)
-		return EFI_UNSUPPORTED;
-
 	switch (ResetType) {
 	case EfiResetWarm:
 		code = 0x06;
