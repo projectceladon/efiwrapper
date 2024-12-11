@@ -405,9 +405,6 @@ static EFI_GET_MEMORY_MAP saved_memmap_bs;
 static EFI_STATUS lpmemmap_init(EFI_SYSTEM_TABLE *st)
 {
 	EFI_STATUS ret;
-#ifndef __CRASH_DUMP
-	EFI_PHYSICAL_ADDRESS start, data, end;
-#endif
 
 	if (!st)
 		return EFI_INVALID_PARAMETER;
@@ -420,18 +417,6 @@ static EFI_STATUS lpmemmap_init(EFI_SYSTEM_TABLE *st)
 	if (EFI_ERROR(ret))
 		return ret;
 
-#ifndef __CRASH_DUMP
-	start = ALIGN_DOWN((EFI_PHYSICAL_ADDRESS)(UINTN)_start, EFI_PAGE_SIZE);
-	data = ALIGN_UP((EFI_PHYSICAL_ADDRESS)(UINTN)_heap, EFI_PAGE_SIZE);
-	ret = insert_mem_descr(start, data, EfiLoaderCode);
-	if (EFI_ERROR(ret))
-		goto err;
-
-	end = ALIGN_UP((EFI_PHYSICAL_ADDRESS)(UINTN)_end, EFI_PAGE_SIZE);
-	ret = insert_mem_descr(data, end, EfiLoaderData);
-	if (EFI_ERROR(ret))
-		goto err;
-#endif
 	saved_memmap_bs = st->BootServices->GetMemoryMap;
 	st->BootServices->GetMemoryMap = get_memory_map;
 	st->BootServices->AllocatePages = allocate_pages;
@@ -439,12 +424,6 @@ static EFI_STATUS lpmemmap_init(EFI_SYSTEM_TABLE *st)
 	crc32 = st->BootServices->CalculateCrc32;
 
 	return EFI_SUCCESS;
-
-#ifndef __CRASH_DUMP
-err:
-	free_efimemmap();
-	return ret;
-#endif
 }
 
 static EFI_STATUS lpmemmap_exit(EFI_SYSTEM_TABLE *st)
