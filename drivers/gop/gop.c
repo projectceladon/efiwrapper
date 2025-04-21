@@ -36,6 +36,7 @@
 #include <pci/pci.h>
 #include <arch/io.h>
 #include <hwconfig.h>
+#include <ewlog.h>
 
 #include "gop.h"
 
@@ -150,6 +151,8 @@ set_mode(EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
 
 	gop->fb = get_framebuffer(gop->dev, gop->pipe);
 	set_efi_color_order(gop->dev);
+
+	ewdbg("set_mode fb = 0x%x", gop->fb);
 	return gop->fb ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 }
 
@@ -236,9 +239,7 @@ static struct supported_device {
 	u16 did;
 } SUPPORTED_DEVICES[] ={
 	{ .vid = 0x8086, .did = VGA_PID },
-	{ .vid = 0x8086, .did = VGA_PID2 },
 };
-
 static EFI_STATUS gop_init(EFI_SYSTEM_TABLE *st)
 {
 	static gop_t gop_default = {
@@ -251,6 +252,8 @@ static EFI_STATUS gop_init(EFI_SYSTEM_TABLE *st)
 	};
 	pcidev_t pci_dev = 0;
 	size_t i;
+	uint16_t command;
+	uint32_t mmio;
 
 	if (!st)
 		return EFI_INVALID_PARAMETER;
@@ -264,14 +267,36 @@ static EFI_STATUS gop_init(EFI_SYSTEM_TABLE *st)
 				    &pci_dev))
 			break;
 
+	ewdbg("VGA pci_dev = %x", pci_dev);
 	if (!pci_dev)
 		return EFI_UNSUPPORTED;
 
+	mmio = pci_read_config32(pci_dev, 0x10);
+	ewdbg("VGA mmio BAR0 = %x", mmio);
+	if ((mmio & 0x6) == 0x4) {
+		/* Stop memory space access  */
+		command = pci_read_config32(pci_dev, 0x4) & 0xffff;
+		command &= ~0x02;
+		pci_write_config32(pci_dev, 0x04, command);
+
+		/* Re-config PCI BAR from 64bits to 32bits */
+		pci_write_config32(pci_dev, 0x14, 0x0);
+		pci_write_config32(pci_dev, 0x10, PLAN_CTRL_ADDR);
+		pci_write_config32(pci_dev, 0x1c, 0x0);
+		pci_write_config32(pci_dev, 0x18, PLAN_FB_ADDR);
+
+		/* Restart memory space access  */
+		command = pci_read_config32(pci_dev, 0x4) & 0xffff;
+		command |= 0x02;
+		pci_write_config32(pci_dev, 0x04, command);
+	}
+
 	gop_default.dev = pci_dev;
 	get_resolution(pci_dev, &info.HorizontalResolution,
-		       &info.VerticalResolution,
-		       &gop_default.pipe);
-
+			&info.VerticalResolution,
+			&gop_default.pipe);
+	ewdbg("HorizontalResolution = %u, VerticalResolution, = %u ", \
+			info.HorizontalResolution,info.VerticalResolution);
 	/* If the BIOS has not programmed any surface, silently
 	   disable the Graphical Output Protocol. */
 	if (!info.HorizontalResolution || !info.VerticalResolution)
