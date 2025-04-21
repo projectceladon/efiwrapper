@@ -36,4 +36,12 @@
 
 extern ewdrv_t gop_drv;
 
+/* VGA compatible controller */
+#define VGA_PID 0xa7a0
+#define IGD_BUS_NUM 0
+#define IGD_DEV_NUM 2
+#define IGD_FUN_NUM 0
+#define PLAN_FB_ADDR   0xB0000000
+#define PLAN_CTRL_ADDR 0xA0000000
+
 #endif	/* _GOP_H_ */
